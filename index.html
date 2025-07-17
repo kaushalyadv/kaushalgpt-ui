@@ -4,56 +4,24 @@
   <meta charset="UTF-8">
   <title>KaushalGPT</title>
   <style>
-    body {
-      font-family: sans-serif;
-      max-width: 600px;
-      margin: 40px auto;
-      padding: 0 20px;
-    }
-    textarea {
-      width: 100%;
-      height: 100px;
-      margin-bottom: 10px;
-      font-size: 16px;
-      padding: 10px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .response {
-      margin-top: 20px;
-      white-space: pre-wrap;
-      background: #f8f8f8;
-      padding: 15px;
-      border: 1px solid #ccc;
-    }
+    textarea { width: 100%; height: 100px; margin-bottom: 10px; }
+    .response { white-space: pre-wrap; background: #f1f1f1; padding: 10px; }
   </style>
 </head>
 <body>
-
   <h1>KaushalGPT</h1>
-  <textarea id="msg" placeholder="Type your message here..."></textarea>
-  <button id="send-btn">Send</button>
-  <div class="response" id="response-box">Response will appear here...</div>
+  <textarea placeholder="Type your message here..."></textarea>
+  <button>Send</button>
+  <div class="response"></div>
 
   <script>
-    fetch("url.json")
+    fetch('url.json')
       .then(res => res.json())
       .then(data => {
         const baseURL = data.url;
 
-        document.getElementById("send-btn").onclick = async () => {
-          const input = document.getElementById("msg").value.trim();
-          const responseBox = document.getElementById("response-box");
-
-          if (!input) {
-            responseBox.innerText = "⚠️ Please type a message first.";
-            return;
-          }
-
-          responseBox.innerText = "⏳ Waiting for response...";
+        document.querySelector("button").onclick = async () => {
+          const input = document.querySelector("textarea").value;
 
           try {
             const res = await fetch(`${baseURL}/chat`, {
@@ -67,19 +35,13 @@
             }
 
             const result = await res.json();
-            responseBox.innerText = result.response || "✅ Success, but empty reply.";
+            document.querySelector(".response").innerText = result.response;
           } catch (err) {
+            document.querySelector(".response").innerText = "Error: " + err.message;
             console.error(err);
-            responseBox.innerText = "❌ Error: Could not reach the server or invalid response.";
           }
         };
-      })
-      .catch(err => {
-        console.error("Failed to load url.json:", err);
-        document.getElementById("response-box").innerText =
-          "❌ Error: Could not load API URL (url.json missing or invalid).";
       });
   </script>
-
 </body>
 </html>
