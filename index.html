@@ -15,33 +15,24 @@
   <div class="response"></div>
 
   <script>
-    fetch('url.json')
-      .then(res => res.json())
-      .then(data => {
-        const baseURL = data.url;
-        document.querySelector("button").onclick = async () => {
-          const input = document.querySelector("textarea").value;
+  fetch('url.json')
+    .then(res => res.json())
+    .then(data => {
+      const baseURL = data.url;
 
-          try {
-            const res = await fetch(`${baseURL}/chat`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ message: input }),
-            });
+      document.querySelector("button").onclick = async () => {
+        const input = document.querySelector("textarea").value;
+        const res = await fetch(`${baseURL}/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: input }),
+        });
 
-            if (!res.ok) {
-              const errorText = await res.text();
-              throw new Error(errorText);
-            }
+        const result = await res.json();
+        document.querySelector(".response").innerText = result.response;
+      };
+    });
+</script>
 
-            const result = await res.json();
-            document.querySelector(".response").innerText = result.response;
-          } catch (error) {
-            document.querySelector(".response").innerText = "⚠️ Error: " + error.message;
-            console.error(error);
-          }
-        };
-      });
-  </script>
 </body>
 </html>
