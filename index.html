@@ -1,45 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>KaushalGPT Chat</title>
+  <meta charset="UTF-8">
+  <title>KaushalGPT</title>
+  <style>
+    textarea { width: 100%; height: 100px; margin-bottom: 10px; }
+    .response { white-space: pre-wrap; background: #f1f1f1; padding: 10px; }
+  </style>
 </head>
 <body>
-  <h2>🤖 KaushalGPT</h2>
-  <div id="chat" style="height: 300px; overflow-y: auto; border: 1px solid gray; padding: 10px;"></div>
-  <input id="msg" placeholder="Ask me..." style="width: 80%;" />
-  <button onclick="send()">Send</button>
+  <h1>KaushalGPT</h1>
+  <textarea placeholder="Type your message here..."></textarea>
+  <button>Send</button>
+  <div class="response"></div>
 
   <script>
-    const BASE = "https://kaushalyadav-lku--kaushalgpt-assistant-app.modal.run";
-  // Replace this
+    fetch('url.json')
+      .then(res => res.json())
+      .then(data => {
+        const baseURL = data.url;
+        document.querySelector("button").onclick = async () => {
+          const input = document.querySelector("textarea").value;
 
-    function addLine(role, msg) {
-      const chat = document.getElementById("chat");
-      const div = document.createElement("div");
-      div.innerHTML = `<b>${role}:</b> ${msg}`;
-      chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
-    }
+          try {
+            const res = await fetch(`${baseURL}/chat`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ message: input }),
+            });
 
-    async function send() {
-      const input = document.getElementById("msg");
-      const msg = input.value.trim();
-      if (!msg) return;
-      addLine("🧑‍💻 You", msg);
-      input.value = "";
+            if (!res.ok) {
+              const errorText = await res.text();
+              throw new Error(errorText);
+            }
 
-      try {
-        const res = await fetch(`${BASE}/ask`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: msg })
-        });
-        const data = await res.json();
-        addLine("🤖 KaushalGPT", data.response);
-      } catch (e) {
-        addLine("⚠️ Error", "Something went wrong.");
-      }
-    }
+            const result = await res.json();
+            document.querySelector(".response").innerText = result.response;
+          } catch (error) {
+            document.querySelector(".response").innerText = "⚠️ Error: " + error.message;
+            console.error(error);
+          }
+        };
+      });
   </script>
 </body>
 </html>
