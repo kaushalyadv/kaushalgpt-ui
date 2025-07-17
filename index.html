@@ -15,10 +15,30 @@
   <div class="response"></div>
 
   <script>
-    fetch('url.json')
-      .then(res => res.json())
-      .then(data => {
-        const baseURL = data.url;
+    const baseURL = "https://d8bc9665ab78.ngrok-free.app";
+
+document.querySelector("button").onclick = async () => {
+  const input = document.querySelector("textarea").value;
+
+  try {
+    const res = await fetch(`${baseURL}/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: input }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Server error: " + res.status);
+    }
+
+    const result = await res.json();
+    document.querySelector(".response").innerText = result.response;
+  } catch (err) {
+    document.querySelector(".response").innerText = "Error: " + err.message;
+    console.error(err);
+  }
+};
+
 
         document.querySelector("button").onclick = async () => {
           const input = document.querySelector("textarea").value;
